@@ -1,0 +1,189 @@
+QUESTÃO 5.1
+
+// Definindo a classe No
+class No {
+  constructor(valor) {
+    this.valor = valor;      // O nome da unidade (ex: "Matriz Central")
+    this.filhos = [];        // Lista de subunidades/franquias
+  }
+
+  // Método para adicionar um filho ao nó
+  adicionarFilho(filho) {
+    this.filhos.push(filho);
+  }
+}
+
+// Função para contar as unidades na rede
+function contarUnidades(raiz) {
+  // A contagem começa com 1 para a unidade raiz
+  let contador = 1;
+
+  // Para cada filho, contar também
+  for (let filho of raiz.filhos) {
+    contador += contarUnidades(filho); // Recursão
+  }
+
+  return contador;
+}
+
+// Função para imprimir a hierarquia com indentação
+function imprimirRede(raiz, nivel = 0) {
+  // Imprime o valor do nó com o nível de indentação
+  console.log(" ".repeat(nivel * 2) + raiz.valor);
+  
+  // Chama recursivamente para os filhos
+  for (let filho of raiz.filhos) {
+    imprimirRede(filho, nivel + 1); // Aumenta o nível de indentação
+  }
+}
+
+// Exemplo de uso:
+
+// Criando a estrutura da rede de franquias
+const matriz = new No("Matriz Central");
+const frq1 = new No("Franquia Zona Sul");
+const frq2 = new No("Franquia Zona Norte");
+const sub1 = new No("Unidade Independente A");
+const sub2 = new No("Unidade Independente B");
+
+// Adicionando as franquias e subunidades
+matriz.adicionarFilho(frq1);
+matriz.adicionarFilho(frq2);
+frq1.adicionarFilho(sub1);
+frq2.adicionarFilho(sub2);
+
+// Contando as unidades na rede
+console.log(contarUnidades(matriz)); // Saída: 5
+
+// Imprimindo a hierarquia da rede
+imprimirRede(matriz);
+
+QUESTÃO 5.2
+
+// Definindo a classe No para representar a árvore binária de expressões
+class No {
+  constructor(valor) {
+    this.valor = valor;      // Pode ser um número ou operador (como '+', '-', '*', '/')
+    this.esquerdo = null;     // Subárvore à esquerda (operando à esquerda)
+    this.direito = null;      // Subárvore à direita (operando à direita)
+  }
+}
+
+// Função para avaliar a expressão representada pela árvore binária
+function avaliarExpressao(no) {
+  // Se o nó for um número (caso base), retornamos o valor dele
+  if (no.esquerdo === null && no.direito === null) {
+    return parseFloat(no.valor);  // Converte para número
+  }
+
+  // Avalia a expressão recursivamente para o nó esquerdo e direito
+  const esquerda = avaliarExpressao(no.esquerdo);
+  const direita = avaliarExpressao(no.direito);
+
+  // Realiza a operação de acordo com o operador no nó
+  switch (no.valor) {
+    case '+':
+      return esquerda + direita;
+    case '-':
+      return esquerda - direita;
+    case '*':
+      return esquerda * direita;
+    case '/':
+      return esquerda / direita;
+    default:
+      throw new Error("Operador inválido: " + no.valor);
+  }
+}
+
+// Exemplo de construção da árvore para a expressão ((8 + 2) - (4 * (6 / 3)))
+const raiz = new No('-');
+raiz.esquerdo = new No('+');
+raiz.direito = new No('*');
+
+// Sub-árvore esquerda: (8 + 2)
+raiz.esquerdo.esquerdo = new No('8');
+raiz.esquerdo.direito = new No('2');
+
+// Sub-árvore direita: (4 * (6 / 3))
+raiz.direito.esquerdo = new No('4');
+raiz.direito.direito = new No('/');
+
+// Sub-árvore para a divisão: (6 / 3)
+raiz.direito.direito.esquerdo = new No('6');
+raiz.direito.direito.direito = new No('3');
+
+// Avaliar a expressão
+const resultado = avaliarExpressao(raiz);
+
+console.log("Resultado da expressão: " + resultado);
+
+
+QUESTÃO 5.3
+
+// Definindo a classe No para a Árvore Binária de Busca (ABB)
+class No {
+  constructor(valor) {
+    this.valor = valor;      // Código do produto
+    this.esquerdo = null;    // Subárvore à esquerda
+    this.direito = null;     // Subárvore à direita
+  }
+
+  // Método para inserir um valor na árvore de forma recursiva
+  inserir(valor) {
+    if (valor < this.valor) {
+      // Inserir na subárvore esquerda
+      if (this.esquerdo === null) {
+        this.esquerdo = new No(valor);
+      } else {
+        this.esquerdo.inserir(valor);
+      }
+    } else {
+      // Inserir na subárvore direita
+      if (this.direito === null) {
+        this.direito = new No(valor);
+      } else {
+        this.direito.inserir(valor);
+      }
+    }
+  }
+}
+
+// Função para buscar os produtos dentro da faixa [min, max] usando percurso in-ordem adaptado
+function buscarFaixa(no, min, max, resultado = []) {
+  if (no === null) {
+    return resultado;
+  }
+
+  // Se o valor do nó for maior que min, podemos verificar a subárvore esquerda
+  if (no.valor > min) {
+    buscarFaixa(no.esquerdo, min, max, resultado);
+  }
+
+  // Se o valor do nó estiver dentro do intervalo, adicionamos ao resultado
+  if (no.valor >= min && no.valor <= max) {
+    resultado.push(no.valor);
+  }
+
+  // Se o valor do nó for menor que max, podemos verificar a subárvore direita
+  if (no.valor < max) {
+    buscarFaixa(no.direito, min, max, resultado);
+  }
+
+  return resultado;
+}
+
+// Exemplo de uso
+
+// Criando a árvore e inserindo os produtos
+const raiz = new No(50);
+raiz.inserir(30);
+raiz.inserir(70);
+raiz.inserir(20);
+raiz.inserir(40);
+raiz.inserir(60);
+raiz.inserir(80);
+
+// Buscando os produtos entre 30 e 65
+const resultado = buscarFaixa(raiz, 30, 65);
+
+console.log("Produtos na faixa de preço: " + resultado);  // Esperado: [30, 40, 50, 60]
